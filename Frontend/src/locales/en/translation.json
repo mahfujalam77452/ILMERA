@@ -1,0 +1,229 @@
+{
+  "menu": {
+    "home": "Home",
+    "about": "About Us",
+    "activities": "Activities",
+    "gallery": "Gallery",
+    "connect": "Connect Us",
+    "blogs": "Articles",
+    "notice": "Notice",
+    "contact": "Contact",
+    "donate": "Donate",
+    "current_project": "Current Project",
+    "appeals": "Appeals"
+  },
+  "footer": {
+    "description": "This institution is striving to build an ideal welfare society by following the footsteps of the Prophet of Humanity, the Messenger of Human Freedom and Peace, the ideal of human service, the Prophet Muhammad (PBUH), in the service of humanity.",
+    "menu_title": "Menu",
+    "connect_title": "Connect",
+    "others_title": "Others",
+    "projects": "Projects",
+    "volunteer": "Volunteer",
+    "terms": "Terms of Conditions",
+    "privacy": "Privacy Policy",
+    "copyright": "Copyright © 2026 Ilmera Foundation (IERF) - All rights reserved."
+  },
+  "home": {
+    "hero_title": "Ilmera Foundation (IERF)",
+    "hero_desc": "Ilmera Education and Research Foundation (IERF) is a non-political, non-profit humanitarian organization dedicated to social welfare, community development, academic research, and international higher-education support.",
+    "know_more": "Know More",
+    "all_activities": "All Activities",
+    "donation_title": "Make Your Donation",
+    "donation_fund": "Donation Fund *",
+    "fund_placeholder": "Select",
+    "phone_email": "Phone / Email *",
+    "donation_amount": "Donation Amount *",
+    "amount_placeholder": "Write in number",
+    "tax_rebate": "You will get a tax rebate by donating to As-Sunnah Foundation. Click for details.",
+    "core_pillars": {
+  "subtitle": "For Ummah, With Sunnah",
+  "education_title": "Education & Research",
+  "education_desc": "Promoting academic research in social sciences and development studies, while providing scholarship guidance, academic mentorship, and structured support for students seeking international higher-education opportunities.",
+  "service_title": "Social Welfare",
+  "service_desc": "Conducting structured humanitarian and welfare initiatives including emergency response, poverty alleviation, Ramadan food distribution, and long-term support for vulnerable communities through a transparent and impact-driven approach.",
+  "dawah_title": "Foreign Scholarship",
+  "dawah_desc": "Providing comprehensive guidance for higher education abroad, including scholarship consultation, application assistance, academic mentoring, and research-oriented preparation for global academic opportunities.",
+  "know_more": "Know More "
+}
+,
+    "ongoing_activities": {
+      "title": "Ongoing Activities",
+      "view_all": "All Activities →"
+    }
+  },
+  "activities_page": {
+    "title": "Our Activities",
+    "breadcrumb": "Home / Activities",
+    "read_more": "Read More",
+    "loading": "Loading activities...",
+    "no_data": "No activities found.",
+    "prev": "Previous",
+    "next": "Next"
+  },
+  "details_page": {
+    "back": "← Back to Activities",
+    "goals": "Project Goals",
+    "beneficiaries": "Beneficiaries",
+    "expenses": "Expense Categories",
+    "area": "Project Area:",
+    "duration": "Duration:",
+    "gallery": "Project Gallery",
+    "watch_video": "Watch Video on YouTube"
+  },
+  "donation_page": {
+    "title": "Donation Funds",
+    "subtitle": "Let's Make Change Together",
+    "donate_btn": "Donate",
+    "breadcrumb": "Home / Donation"
+  },
+  "join_us": {
+    "title": "Join Us",
+    "desc": "Join us through any of the following methods and play your part in serving humanity in need.",
+    "volunteer_title": "Volunteer",
+    "volunteer_btn": "Join Now"
+  },
+  "gallery_page": {
+    "title": "Gallery",
+    "tab_picture": "Picture",
+    "tab_video": "Video",
+    "filter_all": "All",
+    "loading": "Loading Gallery...",
+    "no_images": "No images found in this category.",
+    "breadcrumb": "Home / Gallery"
+  },
+  "home_gallery": {
+    "title": "Photo Gallery",
+    "view_all": "View All Photos"
+  },
+  "blogs_page": {
+    "title": "Articles",
+    "read_more": "Read More",
+    "published_on": "Published on:",
+    "loading": "Loading Articles...",
+    "no_data": "No articles found.",
+    "breadcrumb": "Home / Articles"
+  },
+  "home_blog": {
+    "title": "Latest News & Blogs",
+    "view_all": "View All News"
+  },
+  "connect_page": {
+  "title": "Volunteer Registration",
+  "subtitle": "Join us in serving humanity",
+
+  "sections": {
+    "personal": "Personal Information",
+    "questions": "Volunteer Application Questions"
+  },
+
+  "fields": {
+    "picture": "Profile Photo (Max 2MB)",
+    "name": "Full Name",
+    "email": "Email Address",
+    "country": "Country",
+    "description": "Describe yourself in one sentence",
+    "why": "Why do you want to volunteer?",
+    "motivation": "What motivates you to help others?",
+    "expectation": "What do you expect from this organization?",
+    "is_member": "I am already a member of this organization"
+  },
+
+  "btn_submit": "Submit Application",
+
+  "success_msg": "Your application has been submitted successfully!",
+  "error_msg": "Failed to submit application. Please try again.",
+   "loading": "Submitting your application...",
+  "rules_title": "Volunteer Terms & Conditions:",
+  "rules_list": [
+    "Must agree with the organization's mission and values.",
+    "Must be interested in serving humanity.",
+    "No expectation of financial compensation.",
+    "Must work with honesty and responsibility."
+  ],
+
+  "quote": "The best of people are those who benefit others.",
+  "upload_btn": "Upload"
+}
+,
+  "contact_page": {
+    "title": "Contact Us",
+    "form_name": "Your Name",
+    "form_email": "Your Email",
+    "form_subject": "Subject",
+    "form_message": "Message",
+    "btn_send": "Send Message",
+    "info_phone": "Phone",
+    "info_address": "Address",
+    "info_email": "Email",
+    "info_social": "Social Media"
+  },
+  "make_donation_page": {
+    "title": "Make a Donation",
+    "amount_label": "Select Amount (BDT)",
+    "custom_amount": "Enter Custom Amount",
+    "name_label": "Full Name",
+    "contact_label": "Phone or Email",
+    "category_label": "Select Fund/Category",
+    "btn_pay": "Proceed to Pay",
+    "secure_note": "Your payment is secured by Stripe.",
+    "success_init": "Donation initiated! Proceeding to payment..."
+  },
+  "about_page": {
+    "title": "About Us",
+    "hero_title": "About Us",
+    "principles_title": "Principles and Values",
+    "goals_title": "Goals and Objectives",
+    "tabs": {
+      "education": "Education & Research",
+      "dawah": "Foreign Scholarship",
+      "service": "Social   Welfare"
+    },
+    "principles_list": [
+  "Adhering to ethical integrity, humanitarian values, and research-based approaches in all activities.",
+  "Maintaining a non-profit, non-political, and inclusive identity focused solely on social welfare, education, and research.",
+  "Upholding unity, social harmony, and mutual respect within communities.",
+  "Promoting evidence-based solutions to social challenges through academic research and development studies.",
+  "Responding to humanitarian crises with structured planning, transparency, and measurable impact.",
+  "Ensuring compassion and dignity in serving vulnerable and marginalized communities.",
+  "Providing support and services regardless of religion, race, gender, or background.",
+  "Treating donations and entrusted resources as a sacred responsibility and ensuring proper utilization.",
+  "Maintaining full transparency in financial management and public reporting.",
+  "Ensuring accountability of management, staff, and operational processes.",
+  "Implementing both internal and external audit systems for organizational integrity.",
+  "Upholding the highest standards of honesty, ethics, and zero tolerance toward corruption or malpractice.",
+  "Ensuring professionalism and quality standards across welfare, research, and educational programs.",
+  "Operating independently without political affiliation or influence.",
+  "Recruiting competent professionals and strengthening capacity through continuous training.",
+  "Prioritizing disadvantaged groups including the poor, disaster-affected families, women, and students from underprivileged backgrounds.",
+  "Promoting sustainable development through education, skill development, and poverty alleviation initiatives.",
+  "Focusing on long-term social impact and intellectual development rather than temporary assistance."
+],
+"goals": {
+  "education": [
+    "Promote research in social sciences and development studies addressing real-world challenges.",
+    "Provide structured scholarship guidance and academic mentorship for students seeking international higher education.",
+    "Develop research initiatives, publications, and academic collaborations at national and global levels.",
+    "Support meritorious and underprivileged students with guidance, academic resources, and preparatory assistance.",
+    "Organize seminars, workshops, and training programs focused on research skills and higher-education readiness.",
+    "Encourage youth participation in research, innovation, and global academic opportunities."
+  ],
+  "dawah": [
+    "Provide comprehensive guidance for students applying to foreign universities and scholarship programs.",
+    "Assist in application preparation, documentation, and academic planning.",
+    "Conduct workshops on study abroad opportunities, research proposal writing, and career pathways.",
+    "Create awareness about ethical leadership, global citizenship, and intellectual responsibility.",
+    "Build partnerships with international institutions and academic networks.",
+    "Develop digital resources and mentoring platforms to support higher-education aspirants."
+  ],
+  "service": [
+    "Conduct emergency relief operations during natural disasters and humanitarian crises.",
+    "Implement poverty alleviation programs focused on sustainable income generation.",
+    "Organize Ramadan food distribution and seasonal humanitarian initiatives.",
+    "Support vulnerable communities through structured welfare programs.",
+    "Promote community development initiatives based on research-driven insights.",
+    "Encourage long-term rehabilitation and resilience-building rather than short-term aid."
+  ]
+
+    }
+  }
+}

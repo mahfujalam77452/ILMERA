@@ -1,0 +1,744 @@
+{
+  "info": {
+    "name": "ILMERA Backend API",
+    "description": "Complete API collection for ILMERA plugin management system",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Admin Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@ilmera.com\",\n  \"password\": \"admin@123\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/admin/login",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "admin", "login"]
+            }
+          }
+        },
+        {
+          "name": "Update Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"oldPassword\": \"admin@123\",\n  \"newPassword\": \"newPassword@123\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/admin/update-password",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "admin", "update-password"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Categories",
+      "item": [
+        {
+          "name": "Get All Categories",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{BASE_URL}}/api/categories",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "categories"]
+            }
+          }
+        },
+        {
+          "name": "Add Category",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category\": \"Education\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/categories",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "categories"]
+            }
+          }
+        },
+        {
+          "name": "Delete Category",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/api/categories/{{CATEGORY_ID}}",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "categories", "{{CATEGORY_ID}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pictures",
+      "item": [
+        {
+          "name": "Get All Pictures",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{BASE_URL}}/api/pictures?page=1&limit=20",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "pictures"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Add Picture",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": ""
+                },
+                {
+                  "key": "category",
+                  "value": "{{CATEGORY_ID}}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/pictures",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "pictures"]
+            }
+          }
+        },
+        {
+          "name": "Delete Picture",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/api/pictures/{{PICTURE_ID}}",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "pictures", "{{PICTURE_ID}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Videos",
+      "item": [
+        {
+          "name": "Get All Videos",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{BASE_URL}}/api/videos?page=1&limit=20",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "videos"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Add Video",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"video_link\": \"https://www.youtube.com/watch?v=dQw4w9WgXcQ\",\n  \"title\": \"Sample Video\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/videos",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "videos"]
+            }
+          }
+        },
+        {
+          "name": "Delete Video",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/api/videos/{{VIDEO_ID}}",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "videos", "{{VIDEO_ID}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Activities",
+      "item": [
+        {
+          "name": "Get All Activities",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{BASE_URL}}/api/activities?page=1&limit=20",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "activities"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Add Activity",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "images",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "title",
+                  "value": "Activity Title",
+                  "type": "text"
+                },
+                {
+                  "key": "summary",
+                  "value": "Activity Summary",
+                  "type": "text"
+                },
+                {
+                  "key": "description",
+                  "value": "[\"Paragraph 1\", \"Paragraph 2\"]",
+                  "type": "text"
+                },
+                {
+                  "key": "project_goals",
+                  "value": "[\"Goal 1\", \"Goal 2\"]",
+                  "type": "text"
+                },
+                {
+                  "key": "beneficiaries",
+                  "value": "[\"Group 1\", \"Group 2\"]",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/activities",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "activities"]
+            }
+          }
+        },
+        {
+          "name": "Delete Activity",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/api/activities/{{ACTIVITY_ID}}",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "activities", "{{ACTIVITY_ID}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Blogs",
+      "item": [
+        {
+          "name": "Get All Blogs",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{BASE_URL}}/api/blogs?page=1&limit=20",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "blogs"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Add Blog",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "images",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "title",
+                  "value": "Blog Title",
+                  "type": "text"
+                },
+                {
+                  "key": "date",
+                  "value": "2024-02-09",
+                  "type": "text"
+                },
+                {
+                  "key": "description",
+                  "value": "[\"Paragraph 1\", \"Paragraph 2\"]",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/blogs",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "blogs"]
+            }
+          }
+        },
+        {
+          "name": "Delete Blog",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/api/blogs/{{BLOG_ID}}",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "blogs", "{{BLOG_ID}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Volunteers",
+      "item": [
+        {
+          "name": "Submit Volunteer Form",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "John Doe",
+                  "type": "text"
+                },
+                {
+                  "key": "father_name",
+                  "value": "Dad Name",
+                  "type": "text"
+                },
+                {
+                  "key": "mobile",
+                  "value": "01712345678",
+                  "type": "text"
+                },
+                {
+                  "key": "email",
+                  "value": "john@example.com",
+                  "type": "text"
+                },
+                {
+                  "key": "picture",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/volunteers",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "volunteers"]
+            }
+          }
+        },
+        {
+          "name": "Get All Volunteers",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/api/volunteers?page=1&limit=20",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "volunteers"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Set Volunteer as Member",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/api/volunteers/{{VOLUNTEER_ID}}/member",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "volunteers", "{{VOLUNTEER_ID}}", "member"]
+            }
+          }
+        },
+        {
+          "name": "Delete Volunteer",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/api/volunteers/{{VOLUNTEER_ID}}",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "volunteers", "{{VOLUNTEER_ID}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Contact",
+      "item": [
+        {
+          "name": "Get Contact",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{BASE_URL}}/api/contact",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "contact"]
+            }
+          }
+        },
+        {
+          "name": "Update Contact",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"+880123456789\",\n  \"location\": \"Dhaka, Bangladesh\",\n  \"email\": \"contact@ilmera.com\",\n  \"facebook\": \"https://facebook.com/ilmera\",\n  \"youtube\": \"https://youtube.com/ilmera\",\n  \"linkedin\": \"https://linkedin.com/ilmera\",\n  \"whatsapp\": \"+880123456789\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/contact",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "contact"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Donations",
+      "item": [
+        {
+          "name": "Create Donation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 50,\n  \"name\": \"John Donor\",\n  \"phone_email\": \"john@example.com\",\n  \"category\": \"Education\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/donations",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "donations"]
+            }
+          }
+        },
+        {
+          "name": "Get Donations",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/api/donations?page=1&limit=20&status=success",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "donations"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "status",
+                  "value": "success"
+                },
+                {
+                  "key": "fromDate",
+                  "value": "2024-01-01",
+                  "disabled": true
+                },
+                {
+                  "key": "toDate",
+                  "value": "2024-02-09",
+                  "disabled": true
+                },
+                {
+                  "key": "name",
+                  "value": "John",
+                  "disabled": true
+                },
+                {
+                  "key": "phone_email",
+                  "value": "john@example.com",
+                  "disabled": true
+                },
+                {
+                  "key": "category",
+                  "value": "Education",
+                  "disabled": true
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Donation Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"payment_status\": \"success\",\n  \"stripe_charge_id\": \"ch_1234567890\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/donations/{{DONATION_ID}}/status",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "donations", "{{DONATION_ID}}", "status"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "BASE_URL",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "TOKEN",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "CATEGORY_ID",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "PICTURE_ID",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "VIDEO_ID",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "ACTIVITY_ID",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "BLOG_ID",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "VOLUNTEER_ID",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "DONATION_ID",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
