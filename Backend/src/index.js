@@ -27,8 +27,14 @@ dotenv.config();
 const app = express();
 
 // Middleware
+
 app.use(helmet());
-app.use(cors());
+app.use(cors(
+  {
+    origin: [process.env.CLIENT_URL_1, process.env.CLIENT_URL_2],
+    credentials: true,
+  }
+));
 
 // ✅ Stripe webhook FIRST (before json middleware) because it need raw body for signature verification
 app.use(
