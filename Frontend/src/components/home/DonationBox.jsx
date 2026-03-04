@@ -86,7 +86,11 @@ const DonationBox = () => {
           </div>
         </form>
 
-       
+        <div className="text-center mt-6 text-sm text-green-900 font-medium">
+          <Link to="/about-us" className="hover:underline">
+            {t('home.tax_rebate')}
+          </Link>
+        </div>
       </div>
     </div>
   );
