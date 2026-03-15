@@ -12,6 +12,17 @@ const blogSchema = new mongoose.Schema(
       unique: true,
       trim: true,
     },
+    slug: {
+      type: String,
+      required: [true, "Slug is required"],
+      unique: true,
+      trim: true,
+      lowercase: true,
+      match: [
+        /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+        "Slug must be in kebab-case format",
+      ],
+    },
     pictures_link_list: {
       type: [String],
       required: [true, "At least one picture link is required"],

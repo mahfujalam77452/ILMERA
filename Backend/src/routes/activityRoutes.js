@@ -62,6 +62,13 @@ router.post(
 );
 router.get("/", activityController.getAllActivities);
 router.get("/:id", activityController.getActivityById);
+router.put(
+  "/:id",
+  authenticate,
+  upload.array("images", 5),
+  handleMulterError,
+  activityController.updateActivity,
+);
 router.delete("/:id", authenticate, activityController.deleteActivity);
 
 export default router;

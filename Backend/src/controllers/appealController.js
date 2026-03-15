@@ -6,16 +6,12 @@ import {
 } from "../utils/cloudinary.js";
 import fs from "fs";
 
-// 1️⃣ GET full object by _id
+// 1️⃣ GET full object by slug
 export const getAppealById = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id } = req.params; // This is now the slug
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: "Invalid ID" });
-    }
-
-    const appeal = await Appeal.findById(id);
+    const appeal = await Appeal.findOne({ slug: id.toLowerCase().trim() });
 
     if (!appeal) {
       return res.status(404).json({ message: "Appeal not found" });
@@ -30,9 +26,7 @@ export const getAppealById = async (req, res) => {
 // 2️⃣ GET all appeals (only appeal + image) - Latest to Oldest
 export const getAllAppealsBasic = async (req, res) => {
   try {
-    const appeals = await Appeal.find()
-      .select("appeal image createdAt")
-      .sort({ createdAt: -1 }); // Latest first
+    const appeals = await Appeal.find().select().sort({ createdAt: -1 }); // Latest first
 
     res.status(200).json(appeals);
   } catch (error) {
@@ -43,15 +37,15 @@ export const getAllAppealsBasic = async (req, res) => {
 // 3️⃣ POST create new appeal
 export const createAppeal = async (req, res) => {
   try {
-    const { appeal } = req.body;
+    const { appeal, slug } = req.body;
     const file = req.file;
 
-    if (!appeal || !file) {
+    if (!appeal || !slug || !file) {
       if (file && fs.existsSync(file.path)) {
         fs.unlinkSync(file.path);
       }
       return res.status(400).json({
-        message: "Appeal name and image file are required",
+        message: "Appeal name, slug, and image file are required",
       });
     }
 
@@ -94,6 +88,7 @@ export const createAppeal = async (req, res) => {
 
     const newAppeal = new Appeal({
       appeal,
+      slug: slug.toLowerCase().trim(),
       image: cloudinaryResult.url,
       cloudinary_public_id: cloudinaryResult.public_id,
       title,
@@ -114,20 +109,24 @@ export const createAppeal = async (req, res) => {
         `Warning: Could not delete temporary file: ${fsError.message}`,
       );
     }
+    if (error.code === 11000) {
+      const field = Object.keys(error.keyPattern)[0];
+      return res
+        .status(400)
+        .json({ message: `Appeal ${field} already exists` });
+    }
     res.status(500).json({ message: error.message });
   }
 };
 
-// 4️⃣ DELETE appeal by ID
+// 4️⃣ DELETE appeal by slug
 export const deleteAppeal = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id } = req.params; // This is now the slug
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: "Invalid ID" });
-    }
-
-    const appeal = await Appeal.findByIdAndDelete(id);
+    const appeal = await Appeal.findOneAndDelete({
+      slug: id.toLowerCase().trim(),
+    });
 
     if (!appeal) {
       return res.status(404).json({ message: "Appeal not found" });
@@ -147,21 +146,16 @@ export const deleteAppeal = async (req, res) => {
   }
 };
 
-// 5️⃣ UPDATE appeal by ID
+// 5️⃣ UPDATE appeal by slug
 export const updateAppeal = async (req, res) => {
   try {
-    const { id } = req.params;
-    const { appeal } = req.body;
+    const { id } = req.params; // This is now the slug
+    const { appeal, slug: newSlug } = req.body;
     const file = req.file;
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      if (file && fs.existsSync(file.path)) {
-        fs.unlinkSync(file.path);
-      }
-      return res.status(400).json({ message: "Invalid ID" });
-    }
-
-    const existingAppeal = await Appeal.findById(id);
+    const existingAppeal = await Appeal.findOne({
+      slug: id.toLowerCase().trim(),
+    });
 
     if (!existingAppeal) {
       if (file && fs.existsSync(file.path)) {
@@ -228,9 +222,10 @@ export const updateAppeal = async (req, res) => {
     }
 
     const updatedAppeal = await Appeal.findByIdAndUpdate(
-      id,
+      existingAppeal._id,
       {
         ...(appeal && { appeal }),
+        slug: newSlug ? newSlug.toLowerCase().trim() : existingAppeal.slug,
         image: imageUrl,
         cloudinary_public_id: publicId,
         title,

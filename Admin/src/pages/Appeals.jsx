@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import { X, ChevronDown } from "lucide-react";
+import { X, ChevronDown, Edit } from "lucide-react";
 import AdminLayout from "../components/layouts/AdminLayout";
 import PageHeader from "../components/common/PageHeader";
 import Button from "../components/common/Button";
@@ -10,6 +10,7 @@ import Modal from "../components/common/Modal";
 import LoadingSpinner from "../components/common/LoadingSpinner";
 import ConfirmDialog from "../components/common/ConfirmDialog";
 import Pagination from "../components/common/Pagination";
+import EditAppealModal from "../components/appeal/EditAppealModal";
 import { appealService } from "../services";
 import { validations } from "../utils/validations";
 
@@ -17,11 +18,14 @@ const Appeals = () => {
   const [appeals, setAppeals] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingAppeal, setEditingAppeal] = useState(null);
   const [expandedId, setExpandedId] = useState(null);
 
   // Form state
   const [formData, setFormData] = useState({
     appeal: "",
+    slug: "",
     selectedImage: null,
     titleEn: "",
     titleBn: "",
@@ -118,6 +122,19 @@ const Appeals = () => {
       return false;
     }
 
+    if (!formData.slug.trim()) {
+      toast.error("Slug is required");
+      return false;
+    }
+
+    const slugRegex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+    if (!slugRegex.test(formData.slug.toLowerCase())) {
+      toast.error(
+        "Slug must be in kebab-case format (lowercase letters, numbers, and hyphens only)",
+      );
+      return false;
+    }
+
     if (!formData.selectedImage) {
       toast.error("Please select an image");
       return false;
@@ -146,6 +163,7 @@ const Appeals = () => {
 
       const formDataObj = new FormData();
       formDataObj.append("appeal", formData.appeal);
+      formDataObj.append("slug", formData.slug.toLowerCase().trim());
       formDataObj.append(
         "title",
         JSON.stringify({
@@ -162,6 +180,7 @@ const Appeals = () => {
       // Reset form
       setFormData({
         appeal: "",
+        slug: "",
         selectedImage: null,
         titleEn: "",
         titleBn: "",
@@ -185,7 +204,8 @@ const Appeals = () => {
   const handleDeleteAppeal = async () => {
     try {
       setLoading(true);
-      await appealService.delete(confirmDialog.id);
+      const appeal = appeals.find((a) => a._id === confirmDialog.id);
+      await appealService.delete(appeal.slug);
       toast.success("Appeal deleted successfully!");
       setConfirmDialog({ isOpen: false, id: null });
       await fetchAppeals();
@@ -194,6 +214,17 @@ const Appeals = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleEditAppeal = (appeal) => {
+    setEditingAppeal(appeal);
+    setIsEditModalOpen(true);
+  };
+
+  const handleEditSuccess = async () => {
+    setEditingAppeal(null);
+    setIsEditModalOpen(false);
+    await fetchAppeals();
   };
 
   return (
@@ -247,6 +278,18 @@ const Appeals = () => {
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
+                      handleEditAppeal(appeal);
+                    }}
+                    className="absolute top-4 right-12 text-blue-600 hover:text-blue-800 bg-white rounded-full p-1 shadow"
+                    aria-label="Edit appeal"
+                    title="Edit appeal"
+                  >
+                    <Edit size={18} />
+                  </button>
+
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
                       setConfirmDialog({
                         isOpen: true,
                         id: appeal._id,
@@ -289,6 +332,7 @@ const Appeals = () => {
           setIsModalOpen(false);
           setFormData({
             appeal: "",
+            slug: "",
             selectedImage: null,
             titleEn: "",
             titleBn: "",
@@ -313,6 +357,17 @@ const Appeals = () => {
                 }
                 placeholder="e.g., The Flood of Bangladesh"
                 required
+              />
+
+              <Input
+                label="Slug"
+                value={formData.slug}
+                onChange={(e) =>
+                  setFormData({ ...formData, slug: e.target.value })
+                }
+                placeholder="e.g., the-flood-of-bangladesh"
+                required
+                helperText="Lowercase letters, numbers, and hyphens only (kebab-case)"
               />
 
               <div>
@@ -458,6 +513,18 @@ const Appeals = () => {
           </Button>
         </form>
       </Modal>
+
+      {/* Edit Appeal Modal */}
+      <EditAppealModal
+        isOpen={isEditModalOpen}
+        appeal={editingAppeal}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setEditingAppeal(null);
+        }}
+        onSuccess={handleEditSuccess}
+        loading={loading}
+      />
 
       {/* Confirm Delete Dialog */}
       <ConfirmDialog

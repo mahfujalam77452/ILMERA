@@ -26,8 +26,7 @@ dotenv.config();
 
 const app = express();
 
-// Middleware
-
+// Middlewares
 app.use(helmet());
 app.use(cors(
   {

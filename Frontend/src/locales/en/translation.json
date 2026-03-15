@@ -79,7 +79,7 @@
   "join_us": {
     "title": "Join Us",
     "desc": "Join us through any of the following methods and play your part in serving humanity in need.",
-    "volunteer_title": "Volunteer",
+    "volunteer_title": "Community Ambassador",
     "volunteer_btn": "Join Now"
   },
   "gallery_page": {
@@ -108,7 +108,7 @@
     "view_all": "View All News"
   },
   "connect_page": {
-  "title": "Volunteer Registration",
+  "title": "Community Ambassador Registration",
   "subtitle": "Join us in serving humanity",
 
   "sections": {

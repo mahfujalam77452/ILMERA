@@ -24,7 +24,17 @@ const appealSchema = new mongoose.Schema(
       unique: true,
       trim: true,
     },
-
+    slug: {
+      type: String,
+      required: [true, "Slug is required"],
+      unique: true,
+      trim: true,
+      lowercase: true,
+      match: [
+        /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+        "Slug must be in kebab-case format",
+      ],
+    },
     image: {
       type: String, // image URL from Cloudinary
       required: true,

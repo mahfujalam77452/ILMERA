@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import { X, ChevronDown } from "lucide-react";
+import { X, ChevronDown, Edit } from "lucide-react";
 import AdminLayout from "../components/layouts/AdminLayout";
 import PageHeader from "../components/common/PageHeader";
 import Button from "../components/common/Button";
@@ -10,6 +10,7 @@ import Modal from "../components/common/Modal";
 import LoadingSpinner from "../components/common/LoadingSpinner";
 import ConfirmDialog from "../components/common/ConfirmDialog";
 import Pagination from "../components/common/Pagination";
+import EditActivityModal from "../components/activity/EditActivityModal";
 import { activityService, categoryService } from "../services";
 import { getEmbedUrl, isValidYouTubeUrl } from "../utils/youtubeUtils";
 import { validations } from "../utils/validations";
@@ -19,11 +20,14 @@ const Activities = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingActivity, setEditingActivity] = useState(null);
   const [expandedId, setExpandedId] = useState(null);
 
   // Form state
   const [formData, setFormData] = useState({
     title: "",
+    slug: "",
     summary: "",
     selectedImages: [],
     videoLink: "",
@@ -135,6 +139,19 @@ const Activities = () => {
       return false;
     }
 
+    if (!formData.slug.trim()) {
+      toast.error("Slug is required");
+      return false;
+    }
+
+    const slugRegex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+    if (!slugRegex.test(formData.slug.toLowerCase())) {
+      toast.error(
+        "Slug must be in kebab-case format (lowercase letters, numbers, and hyphens only)",
+      );
+      return false;
+    }
+
     if (formData.selectedImages.length === 0) {
       toast.error("Please select at least one image");
       return false;
@@ -158,6 +175,7 @@ const Activities = () => {
 
       const formDataObj = new FormData();
       formDataObj.append("title", formData.title);
+      formDataObj.append("slug", formData.slug.toLowerCase().trim());
       formDataObj.append("summary", formData.summary || "");
       formDataObj.append("video_link", formData.videoLink || "");
       formDataObj.append(
@@ -186,6 +204,7 @@ const Activities = () => {
       // Reset form
       setFormData({
         title: "",
+        slug: "",
         summary: "",
         selectedImages: [],
         videoLink: "",
@@ -215,7 +234,8 @@ const Activities = () => {
   const handleDeleteActivity = async () => {
     try {
       setLoading(true);
-      await activityService.delete(confirmDialog.id);
+      const activity = activities.find((a) => a._id === confirmDialog.id);
+      await activityService.delete(activity.slug);
       toast.success("Activity deleted successfully!");
       setConfirmDialog({ isOpen: false, id: null });
       await fetchActivities();
@@ -224,6 +244,17 @@ const Activities = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleEditActivity = (activity) => {
+    setEditingActivity(activity);
+    setIsEditModalOpen(true);
+  };
+
+  const handleEditSuccess = async () => {
+    setEditingActivity(null);
+    setIsEditModalOpen(false);
+    await fetchActivities();
   };
 
   return (
@@ -277,6 +308,18 @@ const Activities = () => {
                         {activity.summary}
                       </p>
                     </div>
+
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleEditActivity(activity);
+                      }}
+                      className="text-blue-600 hover:text-blue-800 transition-colors self-start"
+                      aria-label="Edit activity"
+                      title="Edit activity"
+                    >
+                      <Edit size={20} />
+                    </button>
 
                     <button
                       onClick={(e) => {
@@ -354,6 +397,7 @@ const Activities = () => {
           setIsModalOpen(false);
           setFormData({
             title: "",
+            slug: "",
             summary: "",
             selectedImages: [],
             videoLink: "",
@@ -387,7 +431,7 @@ const Activities = () => {
       >
         <form onSubmit={handleAddActivity} className="space-y-6">
           {/* Basic Info */}
-          <div>
+          <div className="space-y-4">
             <h3 className="subsection-title">Basic Information</h3>
             <Input
               label="Activity Title"
@@ -397,6 +441,17 @@ const Activities = () => {
               }
               placeholder="e.g., School Renovation"
               required
+            />
+
+            <Input
+              label="Slug"
+              value={formData.slug}
+              onChange={(e) =>
+                setFormData({ ...formData, slug: e.target.value })
+              }
+              placeholder="e.g., school-renovation"
+              required
+              helperText="Lowercase letters, numbers, and hyphens only (kebab-case)"
             />
 
             <Input
@@ -671,6 +726,18 @@ const Activities = () => {
           </div>
         </form>
       </Modal>
+
+      {/* Edit Activity Modal */}
+      <EditActivityModal
+        isOpen={isEditModalOpen}
+        activity={editingActivity}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setEditingActivity(null);
+        }}
+        onSuccess={handleEditSuccess}
+        loading={loading}
+      />
 
       {/* Confirm Delete Dialog */}
       <ConfirmDialog

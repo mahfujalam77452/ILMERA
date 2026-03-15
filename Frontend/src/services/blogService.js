@@ -1,4 +1,4 @@
-import api from './api';
+import api from "./api";
 
 export const blogService = {
   getBlogs: async (page = 1, limit = 9) => {
@@ -11,14 +11,14 @@ export const blogService = {
     }
   },
 
-  // We didn't use it
-  getBlogById: async (id) => {
+  // Fetch single blog by slug
+  getBlogBySlug: async (slug) => {
     try {
-      const response = await api.get(`/blogs/${id}`);
+      const response = await api.get(`/blogs/${slug}`);
       return response.data;
     } catch (error) {
-      console.error(`Error fetching blog ${id}:`, error);
+      console.error(`Error fetching blog ${slug}:`, error);
       throw error;
     }
-  }
+  },
 };

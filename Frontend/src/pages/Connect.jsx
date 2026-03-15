@@ -11,7 +11,7 @@ const Connect = () => {
       {/* Banner */}
       <div className="bg-[#0B4D26] py-16 px-4 text-center mb-12">
         <h1 className="text-3xl md:text-5xl font-bold text-white mb-4">
-          {t('connect_page.title')}
+          {t('join_us.volunteer_title')}
         </h1>
         <p className="text-green-100 font-medium text-lg mb-2">
           {t('connect_page.subtitle')}

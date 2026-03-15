@@ -41,7 +41,9 @@ const upload = multer({
 const handleMulterError = (err, req, res, next) => {
   if (err instanceof multer.MulterError) {
     if (err.code === "LIMIT_FILE_SIZE") {
-      return res.status(400).json({ success: false, error: "File too large. Max 10MB" });
+      return res
+        .status(400)
+        .json({ success: false, error: "File too large. Max 10MB" });
     }
     return res.status(400).json({ success: false, error: err.message });
   } else if (err) {
@@ -50,8 +52,22 @@ const handleMulterError = (err, req, res, next) => {
   next();
 };
 
-router.post("/", authenticate, upload.array("images", 5), handleMulterError, blogController.addBlog);
+router.post(
+  "/",
+  authenticate,
+  upload.array("images", 5),
+  handleMulterError,
+  blogController.addBlog,
+);
 router.get("/", blogController.getAllBlogs);
+router.get("/:id", blogController.getBlogById);
+router.put(
+  "/:id",
+  authenticate,
+  upload.array("images", 5),
+  handleMulterError,
+  blogController.updateBlog,
+);
 router.delete("/:id", authenticate, blogController.deleteBlog);
 
 export default router;

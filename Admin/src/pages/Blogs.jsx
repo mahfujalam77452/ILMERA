@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import { X, ChevronDown } from "lucide-react";
+import { X, ChevronDown, Edit } from "lucide-react";
 import AdminLayout from "../components/layouts/AdminLayout";
 import PageHeader from "../components/common/PageHeader";
 import Button from "../components/common/Button";
@@ -10,6 +10,7 @@ import Modal from "../components/common/Modal";
 import LoadingSpinner from "../components/common/LoadingSpinner";
 import ConfirmDialog from "../components/common/ConfirmDialog";
 import Pagination from "../components/common/Pagination";
+import EditBlogModal from "../components/blog/EditBlogModal";
 import { blogService } from "../services";
 import { validations } from "../utils/validations";
 
@@ -17,11 +18,14 @@ const Blogs = () => {
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingBlog, setEditingBlog] = useState(null);
   const [expandedId, setExpandedId] = useState(null);
 
   // Form state
   const [formData, setFormData] = useState({
     title: "",
+    slug: "",
     date: new Date().toISOString().split("T")[0],
     selectedImages: [],
     paragraphs: [],
@@ -111,6 +115,19 @@ const Blogs = () => {
       return false;
     }
 
+    if (!formData.slug.trim()) {
+      toast.error("Slug is required");
+      return false;
+    }
+
+    const slugRegex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+    if (!slugRegex.test(formData.slug.toLowerCase())) {
+      toast.error(
+        "Slug must be in kebab-case format (lowercase letters, numbers, and hyphens only)",
+      );
+      return false;
+    }
+
     if (formData.selectedImages.length === 0) {
       toast.error("Please select at least one image");
       return false;
@@ -134,6 +151,7 @@ const Blogs = () => {
 
       const formDataObj = new FormData();
       formDataObj.append("title", formData.title);
+      formDataObj.append("slug", formData.slug.toLowerCase().trim());
       formDataObj.append("date", formData.date);
       formDataObj.append("description", JSON.stringify(formData.paragraphs));
 
@@ -147,6 +165,7 @@ const Blogs = () => {
       // Reset form
       setFormData({
         title: "",
+        slug: "",
         date: new Date().toISOString().split("T")[0],
         selectedImages: [],
         paragraphs: [],
@@ -167,7 +186,8 @@ const Blogs = () => {
   const handleDeleteBlog = async () => {
     try {
       setLoading(true);
-      await blogService.delete(confirmDialog.id);
+      const blog = blogs.find((b) => b._id === confirmDialog.id);
+      await blogService.delete(blog.slug);
       toast.success("Blog deleted successfully!");
       setConfirmDialog({ isOpen: false, id: null });
       await fetchBlogs();
@@ -176,6 +196,17 @@ const Blogs = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleEditBlog = (blog) => {
+    setEditingBlog(blog);
+    setIsEditModalOpen(true);
+  };
+
+  const handleEditSuccess = async () => {
+    setEditingBlog(null);
+    setIsEditModalOpen(false);
+    await fetchBlogs();
   };
 
   return (
@@ -231,6 +262,18 @@ const Blogs = () => {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
+                        handleEditBlog(blog);
+                      }}
+                      className="text-blue-600 hover:text-blue-800 transition-colors self-start"
+                      aria-label="Edit blog"
+                      title="Edit blog"
+                    >
+                      <Edit size={20} />
+                    </button>
+
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
                         setConfirmDialog({ isOpen: true, id: blog._id });
                       }}
                       className="text-red-600 hover:text-red-800 transition-colors self-start"
@@ -279,6 +322,7 @@ const Blogs = () => {
           setIsModalOpen(false);
           setFormData({
             title: "",
+            slug: "",
             date: new Date().toISOString().split("T")[0],
             selectedImages: [],
             paragraphs: [],
@@ -298,8 +342,8 @@ const Blogs = () => {
         }
       >
         <form onSubmit={handleAddBlog} className="space-y-6">
-          {/* Title and Date */}
-          <div>
+          {/* Title, Slug and Date */}
+          <div className="space-y-4">
             <Input
               label="Blog Title"
               value={formData.title}
@@ -308,6 +352,17 @@ const Blogs = () => {
               }
               placeholder="e.g., Impact of Our Programs"
               required
+            />
+
+            <Input
+              label="Slug"
+              value={formData.slug}
+              onChange={(e) =>
+                setFormData({ ...formData, slug: e.target.value })
+              }
+              placeholder="e.g., impact-of-our-programs"
+              required
+              helperText="Lowercase letters, numbers, and hyphens only (kebab-case)"
             />
 
             <Input
@@ -398,6 +453,18 @@ const Blogs = () => {
           </div>
         </form>
       </Modal>
+
+      {/* Edit Blog Modal */}
+      <EditBlogModal
+        isOpen={isEditModalOpen}
+        blog={editingBlog}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setEditingBlog(null);
+        }}
+        onSuccess={handleEditSuccess}
+        loading={loading}
+      />
 
       {/* Confirm Delete Dialog */}
       <ConfirmDialog
