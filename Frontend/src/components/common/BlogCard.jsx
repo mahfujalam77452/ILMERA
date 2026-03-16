@@ -1,6 +1,14 @@
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
+// Helper function to strip HTML tags from text
+const stripHtmlTags = (html) => {
+  if (!html) return "";
+  const temp = document.createElement("div");
+  temp.innerHTML = html;
+  return temp.textContent || temp.innerText || "";
+};
+
 const BlogCard = ({ blog }) => {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
@@ -20,9 +28,9 @@ const BlogCard = ({ blog }) => {
 
   const description =
     Array.isArray(blog.description) && blog.description.length > 0
-      ? blog.description[0]
+      ? stripHtmlTags(blog.description[0])
       : typeof blog.description === "string"
-        ? blog.description
+        ? stripHtmlTags(blog.description)
         : "";
 
   return (

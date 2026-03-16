@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { activityService } from "../services/activityService";
+import { sanitizeHtml } from "../utils/sanitize";
 
 const ActivityDetails = () => {
   const { slug } = useParams();
@@ -138,7 +139,13 @@ const ActivityDetails = () => {
                 activity.description.length > 0 && (
                   <div className="space-y-4 text-gray-700 text-lg leading-relaxed text-justify">
                     {activity.description.map((para, index) => (
-                      <p key={index}>{para}</p>
+                      <div
+                        key={index}
+                        className="prose prose-lg max-w-none prose-a:text-[#0B4D26] prose-a:hover:underline"
+                        dangerouslySetInnerHTML={{
+                          __html: sanitizeHtml(para),
+                        }}
+                      />
                     ))}
                   </div>
                 )}

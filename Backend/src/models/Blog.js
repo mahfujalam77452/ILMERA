@@ -34,6 +34,11 @@ const blogSchema = new mongoose.Schema(
       type: [String],
       required: [true, "Description is required"],
     },
+    apply_link: {
+      type: String,
+      trim: true,
+      default: null,
+    },
   },
   { timestamps: true },
 );

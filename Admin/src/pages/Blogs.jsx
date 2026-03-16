@@ -11,6 +11,7 @@ import LoadingSpinner from "../components/common/LoadingSpinner";
 import ConfirmDialog from "../components/common/ConfirmDialog";
 import Pagination from "../components/common/Pagination";
 import EditBlogModal from "../components/blog/EditBlogModal";
+import RichTextEditor from "../components/common/RichTextEditor";
 import { blogService } from "../services";
 import { validations } from "../utils/validations";
 
@@ -30,6 +31,7 @@ const Blogs = () => {
     selectedImages: [],
     paragraphs: [],
     paragraphInput: "",
+    apply_link: "",
   });
 
   const [confirmDialog, setConfirmDialog] = useState({
@@ -154,6 +156,9 @@ const Blogs = () => {
       formDataObj.append("slug", formData.slug.toLowerCase().trim());
       formDataObj.append("date", formData.date);
       formDataObj.append("description", JSON.stringify(formData.paragraphs));
+      if (formData.apply_link.trim()) {
+        formDataObj.append("apply_link", formData.apply_link.trim());
+      }
 
       formData.selectedImages.forEach((image) => {
         formDataObj.append("images", image);
@@ -170,6 +175,7 @@ const Blogs = () => {
         selectedImages: [],
         paragraphs: [],
         paragraphInput: "",
+        apply_link: "",
       });
 
       setIsModalOpen(false);
@@ -374,6 +380,17 @@ const Blogs = () => {
               }
               required
             />
+
+            <Input
+              label="Apply Now Link (Optional)"
+              type="url"
+              value={formData.apply_link}
+              onChange={(e) =>
+                setFormData({ ...formData, apply_link: e.target.value })
+              }
+              placeholder="https://example.com/apply"
+              helperText="Add an optional link for the 'Apply Now' button"
+            />
           </div>
 
           {/* Images */}
@@ -413,13 +430,12 @@ const Blogs = () => {
           {/* Paragraphs */}
           <div>
             <h3 className="subsection-title">Content</h3>
-            <textarea
+            <RichTextEditor
               value={formData.paragraphInput}
-              onChange={(e) =>
-                setFormData({ ...formData, paragraphInput: e.target.value })
+              onChange={(content) =>
+                setFormData({ ...formData, paragraphInput: content })
               }
-              placeholder="Write a paragraph..."
-              className="input-field h-24 resize-none"
+              placeholder="Write a paragraph with formatting and links..."
             />
             <Button
               type="button"
@@ -438,7 +454,14 @@ const Blogs = () => {
                     key={index}
                     className="p-3 bg-gray-50 rounded-lg flex justify-between"
                   >
-                    <p className="text-sm text-gray-800 flex-1">{para}</p>
+                    <div
+                      className="text-sm text-gray-800 flex-1 prose prose-sm max-w-none"
+                      dangerouslySetInnerHTML={{
+                        __html: para
+                          .substring(0, 100)
+                          .concat(para.length > 100 ? "..." : ""),
+                      }}
+                    />
                     <button
                       type="button"
                       onClick={() => removeParagraph(index)}

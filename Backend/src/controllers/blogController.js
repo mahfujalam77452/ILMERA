@@ -8,7 +8,7 @@ import fs from "fs";
 
 export const addBlog = async (req, res) => {
   try {
-    const { date, title, slug, description } = req.body;
+    const { date, title, slug, description, apply_link } = req.body;
 
     const files = req.files;
 
@@ -51,6 +51,7 @@ export const addBlog = async (req, res) => {
       pictures_link_list,
       cloudinary_public_ids,
       description: JSON.parse(description),
+      ...(apply_link && { apply_link }),
     });
 
     sendSuccess(res, blog, "Blog added successfully", 201);
@@ -125,6 +126,7 @@ export const updateBlog = async (req, res) => {
       slug: newSlug,
       description,
       existingImages,
+      apply_link,
     } = req.body;
     const files = req.files || [];
 
@@ -210,6 +212,7 @@ export const updateBlog = async (req, res) => {
           typeof description === "string"
             ? JSON.parse(description)
             : description,
+        ...(apply_link !== undefined && { apply_link: apply_link || null }),
       },
       { new: true, runValidators: true },
     );

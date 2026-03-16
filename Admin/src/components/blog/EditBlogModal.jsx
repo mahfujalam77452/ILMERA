@@ -5,6 +5,7 @@ import Button from "../common/Button";
 import Input from "../common/Input";
 import Modal from "../common/Modal";
 import LoadingSpinner from "../common/LoadingSpinner";
+import RichTextEditor from "../common/RichTextEditor";
 import { blogService } from "../../services";
 import { validations } from "../../utils/validations";
 
@@ -25,6 +26,7 @@ const EditBlogModal = ({
     existingImages: [], // Images kept from original
     paragraphs: [],
     paragraphInput: "",
+    apply_link: "",
   });
 
   // Load blog data when modal opens
@@ -40,6 +42,7 @@ const EditBlogModal = ({
           ? blog.description
           : [blog.description || ""],
         paragraphInput: "",
+        apply_link: blog.apply_link || "",
       });
     }
   }, [isOpen, blog]);
@@ -181,6 +184,9 @@ const EditBlogModal = ({
         "existingImages",
         JSON.stringify(formData.existingImages),
       );
+      if (formData.apply_link.trim()) {
+        formDataObj.append("apply_link", formData.apply_link.trim());
+      }
 
       // Append new images
       formData.selectedImages.forEach((image) => {
@@ -254,6 +260,17 @@ const EditBlogModal = ({
             value={formData.date}
             onChange={(e) => setFormData({ ...formData, date: e.target.value })}
             required
+          />
+
+          <Input
+            label="Apply Now Link (Optional)"
+            type="url"
+            value={formData.apply_link}
+            onChange={(e) =>
+              setFormData({ ...formData, apply_link: e.target.value })
+            }
+            placeholder="https://example.com/apply"
+            helperText="Add an optional link for the 'Apply Now' button"
           />
         </div>
 
@@ -331,13 +348,12 @@ const EditBlogModal = ({
           <h3 className="subsection-title">Content</h3>
           {editingParagraphIndex === null ? (
             <>
-              <textarea
+              <RichTextEditor
                 value={formData.paragraphInput}
-                onChange={(e) =>
-                  setFormData({ ...formData, paragraphInput: e.target.value })
+                onChange={(content) =>
+                  setFormData({ ...formData, paragraphInput: content })
                 }
-                placeholder="Write a paragraph..."
-                className="input-field h-24 resize-none"
+                placeholder="Write a paragraph with formatting and links..."
               />
               <Button
                 type="button"
@@ -351,14 +367,12 @@ const EditBlogModal = ({
             </>
           ) : (
             <>
-              <textarea
+              <RichTextEditor
                 value={formData.paragraphInput}
-                onChange={(e) =>
-                  setFormData({ ...formData, paragraphInput: e.target.value })
+                onChange={(content) =>
+                  setFormData({ ...formData, paragraphInput: content })
                 }
                 placeholder="Edit paragraph..."
-                className="input-field h-24 resize-none"
-                autoFocus
               />
               <div className="flex gap-2 mt-2">
                 <Button
@@ -388,7 +402,14 @@ const EditBlogModal = ({
                   key={index}
                   className="p-3 bg-gray-50 rounded-lg flex justify-between items-start"
                 >
-                  <p className="text-sm text-gray-800 flex-1">{para}</p>
+                  <div
+                    className="text-sm text-gray-800 flex-1 prose prose-sm max-w-none"
+                    dangerouslySetInnerHTML={{
+                      __html: para
+                        .substring(0, 100)
+                        .concat(para.length > 100 ? "..." : ""),
+                    }}
+                  />
                   <div className="flex gap-1 ml-2 flex-shrink-0">
                     <button
                       type="button"

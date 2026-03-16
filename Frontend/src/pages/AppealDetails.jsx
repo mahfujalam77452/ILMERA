@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { appealService } from "../services/appealService";
+import { sanitizeHtml } from "../utils/sanitize";
 import DonationForm from "../components/donation/DonationForm"; // Adjust path if needed
 
 const AppealDetails = () => {
@@ -99,27 +100,33 @@ const AppealDetails = () => {
                       <h2
                         key={section._id}
                         className="text-2xl md:text-3xl font-bold text-gray-900 mt-8 mb-4"
-                      >
-                        {content}
-                      </h2>
+                        dangerouslySetInnerHTML={{
+                          __html: sanitizeHtml(content),
+                        }}
+                      />
                     );
 
                   case "highlight":
                     return (
                       <div
                         key={section._id}
-                        className="bg-[#0B4D26]/5 border-l-4 border-[#0B4D26] p-6 italic text-gray-800 my-8 rounded-r-lg"
-                      >
-                        {content}
-                      </div>
+                        className="bg-[#0B4D26]/5 border-l-4 border-[#0B4D26] p-6 italic text-gray-800 my-8 rounded-r-lg prose prose-sm max-w-none prose-a:text-[#0B4D26] prose-a:hover:underline"
+                        dangerouslySetInnerHTML={{
+                          __html: sanitizeHtml(content),
+                        }}
+                      />
                     );
 
                   case "paragraph":
                   default:
                     return (
-                      <p key={section._id} className="mb-4 text-justify">
-                        {content}
-                      </p>
+                      <div
+                        key={section._id}
+                        className="mb-4 text-justify prose prose-lg max-w-none prose-a:text-[#0B4D26] prose-a:hover:underline"
+                        dangerouslySetInnerHTML={{
+                          __html: sanitizeHtml(content),
+                        }}
+                      />
                     );
                 }
               })}

@@ -11,6 +11,7 @@ import LoadingSpinner from "../components/common/LoadingSpinner";
 import ConfirmDialog from "../components/common/ConfirmDialog";
 import Pagination from "../components/common/Pagination";
 import EditActivityModal from "../components/activity/EditActivityModal";
+import RichTextEditor from "../components/common/RichTextEditor";
 import { activityService, categoryService } from "../services";
 import { getEmbedUrl, isValidYouTubeUrl } from "../utils/youtubeUtils";
 import { validations } from "../utils/validations";
@@ -515,13 +516,12 @@ const Activities = () => {
           {/* Paragraphs */}
           <div>
             <h3 className="subsection-title">Description (Paragraphs)</h3>
-            <textarea
+            <RichTextEditor
               value={formData.paragraphInput}
-              onChange={(e) =>
-                setFormData({ ...formData, paragraphInput: e.target.value })
+              onChange={(content) =>
+                setFormData({ ...formData, paragraphInput: content })
               }
-              placeholder="Write a paragraph..."
-              className="input-field h-24 resize-none"
+              placeholder="Write a paragraph with formatting and links..."
             />
             <Button
               type="button"
@@ -546,7 +546,14 @@ const Activities = () => {
                     key={index}
                     className="p-3 bg-gray-50 rounded-lg flex justify-between"
                   >
-                    <p className="text-sm text-gray-800 flex-1">{para}</p>
+                    <div
+                      className="text-sm text-gray-800 flex-1 prose prose-sm max-w-none"
+                      dangerouslySetInnerHTML={{
+                        __html: para
+                          .substring(0, 100)
+                          .concat(para.length > 100 ? "..." : ""),
+                      }}
+                    />
                     <button
                       type="button"
                       onClick={() => removeArrayItem("paragraphs", index)}

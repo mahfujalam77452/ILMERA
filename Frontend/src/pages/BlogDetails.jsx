@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useLocation, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { blogService } from "../services/blogService";
+import { sanitizeHtml } from "../utils/sanitize";
 import Lightbox from "../components/gallery/Lightbox";
 
 const BlogDetails = () => {
@@ -107,17 +108,62 @@ const BlogDetails = () => {
             </h1>
 
             {/* Description (Array of paragraphs) */}
-            <div className="prose prose-lg max-w-none text-gray-700 text-justify leading-relaxed mb-10">
+            <div
+              className="prose prose-lg max-w-none text-gray-700 text-justify leading-relaxed mb-10"
+              style={{
+                "--tw-prose-links": "#0B4D26",
+              }}
+            >
               {Array.isArray(blog.description) ? (
                 blog.description.map((para, idx) => (
-                  <p key={idx} className="mb-4">
-                    {para}
-                  </p>
+                  <div
+                    key={idx}
+                    className="mb-4 prose prose-lg max-w-none"
+                    dangerouslySetInnerHTML={{
+                      __html: sanitizeHtml(para),
+                    }}
+                    style={{
+                      "--tw-prose-links": "#0B4D26",
+                    }}
+                  />
                 ))
               ) : (
-                <p>{blog.description}</p>
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: sanitizeHtml(blog.description),
+                  }}
+                  style={{
+                    "--tw-prose-links": "#0B4D26",
+                  }}
+                />
               )}
+              <style>{`
+                .prose a {
+                  color: #0B4D26;
+                  text-decoration: underline;
+                  cursor: pointer;
+                  transition: color 0.2s;
+                }
+                .prose a:hover {
+                  color: #094620;
+                  text-decoration: none;
+                }
+              `}</style>
             </div>
+
+            {/* Apply Now Button - Optional */}
+            {blog.apply_link && (
+              <div className="mb-10 pb-6 border-b border-gray-200">
+                <a
+                  href={blog.apply_link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block bg-[#0B4D26] hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg transition-colors duration-300 shadow-md"
+                >
+                  Apply Now
+                </a>
+              </div>
+            )}
 
             {/* Additional Images Gallery */}
             {images.length > 1 && (

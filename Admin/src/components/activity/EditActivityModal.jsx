@@ -4,6 +4,7 @@ import { X } from "lucide-react";
 import Button from "../common/Button";
 import Input from "../common/Input";
 import Modal from "../common/Modal";
+import RichTextEditor from "../common/RichTextEditor";
 import { activityService } from "../../services";
 import { validations } from "../../utils/validations";
 import { getEmbedUrl, isValidYouTubeUrl } from "../../utils/youtubeUtils";
@@ -679,13 +680,12 @@ const EditActivityModal = ({
           <h3 className="subsection-title">Description</h3>
           {editingField !== "paragraphs" ? (
             <>
-              <textarea
+              <RichTextEditor
                 value={formData.paragraphInput}
-                onChange={(e) =>
-                  setFormData({ ...formData, paragraphInput: e.target.value })
+                onChange={(content) =>
+                  setFormData({ ...formData, paragraphInput: content })
                 }
-                placeholder="Add a paragraph..."
-                className="input-field h-24 resize-none"
+                placeholder="Add a paragraph with formatting and links..."
               />
               <Button
                 type="button"
@@ -699,14 +699,12 @@ const EditActivityModal = ({
             </>
           ) : (
             <>
-              <textarea
+              <RichTextEditor
                 value={formData.paragraphInput}
-                onChange={(e) =>
-                  setFormData({ ...formData, paragraphInput: e.target.value })
+                onChange={(content) =>
+                  setFormData({ ...formData, paragraphInput: content })
                 }
                 placeholder="Edit paragraph..."
-                className="input-field h-24 resize-none"
-                autoFocus
               />
               <div className="flex gap-2 mt-2">
                 <Button
@@ -736,7 +734,14 @@ const EditActivityModal = ({
                   key={index}
                   className="p-3 bg-gray-50 rounded flex justify-between items-start"
                 >
-                  <p className="text-sm text-gray-800 flex-1">{para}</p>
+                  <div
+                    className="text-sm text-gray-800 flex-1 prose prose-sm max-w-none"
+                    dangerouslySetInnerHTML={{
+                      __html: para
+                        .substring(0, 100)
+                        .concat(para.length > 100 ? "..." : ""),
+                    }}
+                  />
                   <div className="flex gap-1 ml-2 flex-shrink-0">
                     <button
                       type="button"

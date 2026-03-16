@@ -11,6 +11,7 @@ import LoadingSpinner from "../components/common/LoadingSpinner";
 import ConfirmDialog from "../components/common/ConfirmDialog";
 import Pagination from "../components/common/Pagination";
 import EditAppealModal from "../components/appeal/EditAppealModal";
+import RichTextEditor from "../components/common/RichTextEditor";
 import { appealService } from "../services";
 import { validations } from "../utils/validations";
 
@@ -439,29 +440,33 @@ const Appeals = () => {
                   </select>
                 </div>
 
-                <Input
-                  label="Content (English)"
-                  value={formData.sectionContentEn}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      sectionContentEn: e.target.value,
-                    })
-                  }
-                  placeholder="Enter content in English"
-                />
+                <div>
+                  <label className="form-label">Content (English)</label>
+                  <RichTextEditor
+                    value={formData.sectionContentEn}
+                    onChange={(content) =>
+                      setFormData({
+                        ...formData,
+                        sectionContentEn: content,
+                      })
+                    }
+                    placeholder="Enter content in English with formatting and links..."
+                  />
+                </div>
 
-                <Input
-                  label="Content (Bengali)"
-                  value={formData.sectionContentBn}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      sectionContentBn: e.target.value,
-                    })
-                  }
-                  placeholder="বাংলায় কন্টেন্ট লিখুন"
-                />
+                <div>
+                  <label className="form-label">Content (Bengali)</label>
+                  <RichTextEditor
+                    value={formData.sectionContentBn}
+                    onChange={(content) =>
+                      setFormData({
+                        ...formData,
+                        sectionContentBn: content,
+                      })
+                    }
+                    placeholder="বাংলায় কন্টেন্ট লিখুন ফরম্যাটিং এবং লিঙ্ক সহ..."
+                  />
+                </div>
 
                 <Button variant="secondary" onClick={addSection} type="button">
                   Add Section
@@ -478,17 +483,24 @@ const Appeals = () => {
                 {formData.sections.map((section, index) => (
                   <Card key={index} className="bg-blue-50">
                     <div className="flex justify-between items-start">
-                      <div>
+                      <div className="flex-1">
                         <p className="text-sm font-semibold text-gray-900 capitalize">
                           {section.type}
                         </p>
-                        <p className="text-sm text-gray-700 mt-2">
-                          {section.content.en}
-                        </p>
+                        <div
+                          className="text-sm text-gray-700 mt-2 prose prose-sm max-w-none"
+                          dangerouslySetInnerHTML={{
+                            __html: section.content.en
+                              .substring(0, 150)
+                              .concat(
+                                section.content.en.length > 150 ? "..." : "",
+                              ),
+                          }}
+                        />
                       </div>
                       <button
                         onClick={() => removeSection(index)}
-                        className="text-red-600 hover:text-red-800"
+                        className="text-red-600 hover:text-red-800 ml-2 flex-shrink-0"
                         type="button"
                       >
                         <X size={20} />

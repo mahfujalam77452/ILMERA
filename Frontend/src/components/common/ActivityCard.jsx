@@ -1,6 +1,14 @@
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
+// Helper function to strip HTML tags from text
+const stripHtmlTags = (html) => {
+  if (!html) return "";
+  const temp = document.createElement("div");
+  temp.innerHTML = html;
+  return temp.textContent || temp.innerText || "";
+};
+
 const ActivityCard = ({ activity }) => {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
@@ -15,7 +23,7 @@ const ActivityCard = ({ activity }) => {
   const description =
     activity.summary ||
     (Array.isArray(activity.description)
-      ? activity.description[0]
+      ? stripHtmlTags(activity.description[0])
       : "No Description");
 
   const dateOptions = { year: "numeric", month: "long", day: "numeric" };

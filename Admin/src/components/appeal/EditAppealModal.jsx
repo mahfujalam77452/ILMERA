@@ -4,6 +4,7 @@ import { X } from "lucide-react";
 import Button from "../common/Button";
 import Input from "../common/Input";
 import Modal from "../common/Modal";
+import RichTextEditor from "../common/RichTextEditor";
 import { appealService } from "../../services";
 import { validations } from "../../utils/validations";
 
@@ -345,23 +346,27 @@ const EditAppealModal = ({
                 <option value="quote">Quote</option>
               </select>
 
-              <textarea
-                value={formData.sectionContentEn}
-                onChange={(e) =>
-                  setFormData({ ...formData, sectionContentEn: e.target.value })
-                }
-                placeholder="Content in English..."
-                className="input-field h-20 resize-none"
-              />
+              <div>
+                <label className="form-label">Content (English)</label>
+                <RichTextEditor
+                  value={formData.sectionContentEn}
+                  onChange={(content) =>
+                    setFormData({ ...formData, sectionContentEn: content })
+                  }
+                  placeholder="Content in English with formatting and links..."
+                />
+              </div>
 
-              <textarea
-                value={formData.sectionContentBn}
-                onChange={(e) =>
-                  setFormData({ ...formData, sectionContentBn: e.target.value })
-                }
-                placeholder="বিষয়বস্তু বাংলায়..."
-                className="input-field h-20 resize-none"
-              />
+              <div>
+                <label className="form-label">Content (Bengali)</label>
+                <RichTextEditor
+                  value={formData.sectionContentBn}
+                  onChange={(content) =>
+                    setFormData({ ...formData, sectionContentBn: content })
+                  }
+                  placeholder="বিষয়বস্তু বাংলায় ফরম্যাটিং এবং লিঙ্ক সহ..."
+                />
+              </div>
 
               <Input
                 label="Section Order"
@@ -395,24 +400,27 @@ const EditAppealModal = ({
                 <option value="quote">Quote</option>
               </select>
 
-              <textarea
-                value={formData.sectionContentEn}
-                onChange={(e) =>
-                  setFormData({ ...formData, sectionContentEn: e.target.value })
-                }
-                placeholder="Content in English..."
-                className="input-field h-20 resize-none"
-                autoFocus
-              />
+              <div>
+                <label className="form-label">Content (English)</label>
+                <RichTextEditor
+                  value={formData.sectionContentEn}
+                  onChange={(content) =>
+                    setFormData({ ...formData, sectionContentEn: content })
+                  }
+                  placeholder="Content in English with formatting and links..."
+                />
+              </div>
 
-              <textarea
-                value={formData.sectionContentBn}
-                onChange={(e) =>
-                  setFormData({ ...formData, sectionContentBn: e.target.value })
-                }
-                placeholder="বিষয়বস্তু বাংলায়..."
-                className="input-field h-20 resize-none"
-              />
+              <div>
+                <label className="form-label">Content (Bengali)</label>
+                <RichTextEditor
+                  value={formData.sectionContentBn}
+                  onChange={(content) =>
+                    setFormData({ ...formData, sectionContentBn: content })
+                  }
+                  placeholder="বিষয়বস্তু বাংলায় ফরম্যাটিং এবং লিঙ্ক সহ..."
+                />
+              </div>
 
               <Input
                 label="Section Order"
@@ -479,10 +487,26 @@ const EditAppealModal = ({
                     </div>
                   </div>
                   <p className="text-sm text-gray-800 mb-1">
-                    <strong>EN:</strong> {section.content.en}
+                    <strong>EN:</strong>{" "}
+                    <span
+                      className="prose prose-sm max-w-none"
+                      dangerouslySetInnerHTML={{
+                        __html: section.content.en
+                          .substring(0, 100)
+                          .concat(section.content.en.length > 100 ? "..." : ""),
+                      }}
+                    />
                   </p>
                   <p className="text-sm text-gray-800">
-                    <strong>BN:</strong> {section.content.bn}
+                    <strong>BN:</strong>{" "}
+                    <span
+                      className="prose prose-sm max-w-none"
+                      dangerouslySetInnerHTML={{
+                        __html: section.content.bn
+                          .substring(0, 100)
+                          .concat(section.content.bn.length > 100 ? "..." : ""),
+                      }}
+                    />
                   </p>
                 </div>
               ))}
