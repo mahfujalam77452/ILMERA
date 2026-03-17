@@ -14,6 +14,7 @@ import { validations } from "../utils/validations";
 const CurrentProject = () => {
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
+  const [editingSectionIndex, setEditingSectionIndex] = useState(null);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -105,6 +106,57 @@ const CurrentProject = () => {
       ...formData,
       sections: formData.sections.filter((_, i) => i !== index),
     });
+  };
+
+  const startEditSection = (index) => {
+    const section = formData.sections[index];
+    setFormData({
+      ...formData,
+      sectionType: section.type,
+      sectionContentEn: section.content.en,
+      sectionContentBn: section.content.bn,
+      sectionOrder: section.order,
+    });
+    setEditingSectionIndex(index);
+  };
+
+  const saveEditSection = () => {
+    if (
+      !formData.sectionContentEn.trim() ||
+      !formData.sectionContentBn.trim()
+    ) {
+      toast.error("Please fill both English and Bengali content");
+      return;
+    }
+
+    const updatedSections = [...formData.sections];
+    updatedSections[editingSectionIndex] = {
+      type: formData.sectionType,
+      content: {
+        en: formData.sectionContentEn,
+        bn: formData.sectionContentBn,
+      },
+      order: formData.sectionOrder,
+    };
+
+    setFormData({
+      ...formData,
+      sections: updatedSections,
+      sectionType: "heading",
+      sectionContentEn: "",
+      sectionContentBn: "",
+    });
+    setEditingSectionIndex(null);
+  };
+
+  const cancelEditSection = () => {
+    setFormData({
+      ...formData,
+      sectionType: "heading",
+      sectionContentEn: "",
+      sectionContentBn: "",
+    });
+    setEditingSectionIndex(null);
   };
 
   const validateForm = () => {
@@ -289,10 +341,12 @@ const CurrentProject = () => {
             <div>
               <h3 className="subsection-title">Content Sections</h3>
 
-              {/* Add Section Form */}
+              {/* Add/Edit Section Form */}
               <Card className="bg-gray-50 mb-4">
                 <h4 className="font-semibold text-gray-900 mb-4">
-                  Add Section
+                  {editingSectionIndex === null
+                    ? "Add Section"
+                    : "Edit Section"}
                 </h4>
 
                 <div className="space-y-4">
@@ -343,13 +397,32 @@ const CurrentProject = () => {
                     />
                   </div>
 
-                  <Button
-                    variant="secondary"
-                    onClick={addSection}
-                    type="button"
-                  >
-                    Add Section
-                  </Button>
+                  {editingSectionIndex === null ? (
+                    <Button
+                      variant="secondary"
+                      onClick={addSection}
+                      type="button"
+                    >
+                      Add Section
+                    </Button>
+                  ) : (
+                    <div className="flex gap-2">
+                      <Button
+                        variant="primary"
+                        onClick={saveEditSection}
+                        type="button"
+                      >
+                        Save Edit
+                      </Button>
+                      <Button
+                        variant="secondary"
+                        onClick={cancelEditSection}
+                        type="button"
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </Card>
 
@@ -377,13 +450,24 @@ const CurrentProject = () => {
                             }}
                           />
                         </div>
-                        <button
-                          onClick={() => removeSection(index)}
-                          className="text-red-600 hover:text-red-800 ml-2 flex-shrink-0"
-                          type="button"
-                        >
-                          <X size={20} />
-                        </button>
+                        <div className="flex gap-1 ml-2 flex-shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => startEditSection(index)}
+                            className="text-blue-600 hover:text-blue-800 px-2 py-1 rounded hover:bg-blue-50"
+                            title="Edit section"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => removeSection(index)}
+                            className="text-red-600 hover:text-red-800 px-2 py-1 rounded hover:bg-red-50"
+                            title="Delete section"
+                          >
+                            <X size={18} />
+                          </button>
+                        </div>
                       </div>
                     </Card>
                   ))}

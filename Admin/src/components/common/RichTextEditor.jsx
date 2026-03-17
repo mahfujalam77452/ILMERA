@@ -6,20 +6,14 @@ const RichTextEditor = ({ value, onChange, placeholder }) => {
   const editorRef = useRef(null);
   const [linkUrl, setLinkUrl] = useState("");
   const [showLinkInput, setShowLinkInput] = useState(false);
-  const isInitialized = useRef(false);
 
-  // Initialize editor content once
+  // Sync editor content with value prop
   useEffect(() => {
-    if (editorRef.current && !isInitialized.current && value) {
-      editorRef.current.innerHTML = value;
-      isInitialized.current = true;
-    }
-  }, []);
-
-  // Reset initialized flag when value is cleared externally
-  useEffect(() => {
-    if (!value && isInitialized.current) {
-      isInitialized.current = false;
+    if (editorRef.current && value !== undefined && value !== null) {
+      // Only update if the content is different to avoid cursor jumping
+      if (editorRef.current.innerHTML !== value) {
+        editorRef.current.innerHTML = value;
+      }
     }
   }, [value]);
 
