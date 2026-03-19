@@ -26,7 +26,7 @@ const Footer = () => {
             
             {/* Social Icons imported from assets */}
             <div className="flex space-x-4 pt-4">
-              <a href="https://www.facebook.com/ilmeraresearchfoundatoin" className="hover:opacity-75 transition-opacity">
+              <a href="https://www.facebook.com/ilmerafoundation" className="hover:opacity-75 transition-opacity">
                 <img src={facebook} alt="Facebook" className="h-5 w-8 object-contain" />
               </a>
               <a href="https://www.youtube.com/@Ilmerafoundation" className="hover:opacity-75 transition-opacity">
