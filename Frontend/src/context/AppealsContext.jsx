@@ -12,7 +12,15 @@ export const AppealsProvider = ({ children }) => {
     const fetchAppeals = async () => {
       try {
         const data = await appealService.getAllAppeals();
-        setAppeals(data);
+        const normalizedAppeals = Array.isArray(data)
+          ? data
+          : Array.isArray(data?.data)
+            ? data.data
+            : Array.isArray(data?.appeals)
+              ? data.appeals
+              : [];
+
+        setAppeals(normalizedAppeals);
       } catch (error) {
         console.error("Failed to fetch appeals:", error);
       } finally {

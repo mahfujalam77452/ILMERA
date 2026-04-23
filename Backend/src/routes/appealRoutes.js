@@ -54,10 +54,26 @@ router.get("/", getAllAppealsBasic);
 router.get("/:id", getAppealById);
 
 // 3️⃣ Create new appeal (Admin only)
-router.post("/", authenticate, upload.single("image"), createAppeal);
+router.post(
+  "/",
+  authenticate,
+  upload.fields([
+    { name: "image", maxCount: 1 },
+    { name: "sectionImages", maxCount: 20 },
+  ]),
+  createAppeal,
+);
 
 // 4️⃣ Update appeal by ID (Admin only)
-router.put("/:id", authenticate, upload.single("image"), updateAppeal);
+router.put(
+  "/:id",
+  authenticate,
+  upload.fields([
+    { name: "image", maxCount: 1 },
+    { name: "sectionImages", maxCount: 20 },
+  ]),
+  updateAppeal,
+);
 
 // 5️⃣ Delete appeal by ID (Admin only)
 router.delete("/:id", authenticate, deleteAppeal);

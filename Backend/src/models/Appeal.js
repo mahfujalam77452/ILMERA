@@ -14,6 +14,14 @@ const sectionSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  image: {
+    type: String,
+    default: null,
+  },
+  cloudinary_public_id: {
+    type: String,
+    default: null,
+  },
 });
 
 const appealSchema = new mongoose.Schema(

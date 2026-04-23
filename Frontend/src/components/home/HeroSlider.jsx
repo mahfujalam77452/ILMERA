@@ -8,27 +8,28 @@ const HeroSlider = () => {
   const { appeals, loading } = useAppeals();
   const [currentIndex, setCurrentIndex] = useState(0);
   const navigate = useNavigate();
+  const safeAppeals = Array.isArray(appeals) ? appeals : [];
 
   // Auto-slide logic (Runs every 5 seconds)
   useEffect(() => {
-    if (!appeals || appeals.length === 0) return;
+    if (safeAppeals.length === 0) return;
 
     const interval = setInterval(() => {
       nextSlide();
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [currentIndex, appeals]);
+  }, [currentIndex, safeAppeals]);
 
   const nextSlide = () => {
     setCurrentIndex((prevIndex) =>
-      prevIndex === appeals.length - 1 ? 0 : prevIndex + 1,
+      prevIndex === safeAppeals.length - 1 ? 0 : prevIndex + 1,
     );
   };
 
   const prevSlide = () => {
     setCurrentIndex((prevIndex) =>
-      prevIndex === 0 ? appeals.length - 1 : prevIndex - 1,
+      prevIndex === 0 ? safeAppeals.length - 1 : prevIndex - 1,
     );
   };
 
@@ -39,9 +40,9 @@ const HeroSlider = () => {
 
   if (loading)
     return <div className="h-[500px] bg-gray-100 animate-pulse"></div>;
-  if (!appeals || appeals.length === 0) return null;
+  if (safeAppeals.length === 0) return null;
 
-  const currentAppeal = appeals[currentIndex];
+  const currentAppeal = safeAppeals[currentIndex] || safeAppeals[0];
 
   return (
     <div className="relative w-full h-[65vh] md:h-[80vh] overflow-hidden group">
@@ -143,7 +144,7 @@ const HeroSlider = () => {
 
       {/* Slide Indicators (Dots at bottom) */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
-        {appeals.map((_, index) => (
+        {safeAppeals.map((_, index) => (
           <button
             key={index}
             onClick={() => setCurrentIndex(index)}

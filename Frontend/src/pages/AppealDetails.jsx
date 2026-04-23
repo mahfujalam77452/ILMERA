@@ -120,13 +120,33 @@ const AppealDetails = () => {
                   case "paragraph":
                   default:
                     return (
-                      <div
-                        key={section._id}
-                        className="mb-4 text-justify prose prose-lg max-w-none prose-a:text-[#0B4D26] prose-a:hover:underline"
-                        dangerouslySetInnerHTML={{
-                          __html: sanitizeHtml(content),
-                        }}
-                      />
+                      <div key={section._id} className="mb-6 overflow-hidden">
+                        {section.image ? (
+                          <>
+                            <div className="md:float-right md:w-[60%] md:max-w-none md:ml-6 md:mb-4 w-full mb-4">
+                              <img
+                                src={section.image}
+                                alt="Section"
+                                className="w-full h-auto rounded-xl shadow-sm border border-gray-200"
+                              />
+                            </div>
+
+                            <div
+                              className="text-justify prose prose-lg max-w-none prose-a:text-[#0B4D26] prose-a:hover:underline"
+                              dangerouslySetInnerHTML={{
+                                __html: sanitizeHtml(content),
+                              }}
+                            />
+                          </>
+                        ) : (
+                          <div
+                            className="text-justify prose prose-lg max-w-none prose-a:text-[#0B4D26] prose-a:hover:underline"
+                            dangerouslySetInnerHTML={{
+                              __html: sanitizeHtml(content),
+                            }}
+                          />
+                        )}
+                      </div>
                     );
                 }
               })}

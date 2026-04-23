@@ -35,6 +35,8 @@ const Appeals = () => {
     sectionContentEn: "",
     sectionContentBn: "",
     sectionOrder: 1,
+    sectionImage: null,
+    sectionImagePreview: null,
   });
 
   const [confirmDialog, setConfirmDialog] = useState({
@@ -83,6 +85,28 @@ const Appeals = () => {
     }
   };
 
+  const handleSectionImageChange = (e) => {
+    const file = e.target.files?.[0];
+
+    if (file) {
+      if (!validations.isValidFile(file)) {
+        toast.error("Invalid file. Please upload an image (max 10MB)");
+        setFormData({
+          ...formData,
+          sectionImage: null,
+          sectionImagePreview: null,
+        });
+        return;
+      }
+
+      setFormData({
+        ...formData,
+        sectionImage: file,
+        sectionImagePreview: URL.createObjectURL(file),
+      });
+    }
+  };
+
   const addSection = () => {
     if (
       !formData.sectionContentEn.trim() ||
@@ -99,6 +123,11 @@ const Appeals = () => {
         bn: formData.sectionContentBn,
       },
       order: formData.sectionOrder,
+      image: null,
+      cloudinary_public_id: null,
+      imageFile: formData.sectionImage,
+      imagePreview: formData.sectionImagePreview,
+      hasImage: Boolean(formData.sectionImage),
     };
 
     setFormData({
@@ -107,6 +136,8 @@ const Appeals = () => {
       sectionContentEn: "",
       sectionContentBn: "",
       sectionOrder: formData.sectionOrder + 1,
+      sectionImage: null,
+      sectionImagePreview: null,
     });
   };
 
@@ -175,6 +206,14 @@ const Appeals = () => {
       formDataObj.append("sections", JSON.stringify(formData.sections));
       formDataObj.append("image", formData.selectedImage);
 
+      const sectionImages = formData.sections.filter(
+        (section) => section.type === "paragraph" && section.imageFile,
+      );
+
+      sectionImages.forEach((section) => {
+        formDataObj.append("sectionImages", section.imageFile);
+      });
+
       await appealService.add(formDataObj);
       toast.success("Appeal added successfully!");
 
@@ -190,6 +229,8 @@ const Appeals = () => {
         sectionContentEn: "",
         sectionContentBn: "",
         sectionOrder: 1,
+        sectionImage: null,
+        sectionImagePreview: null,
       });
       setIsModalOpen(false);
       setPagination({ ...pagination, current: 1 });
@@ -342,6 +383,8 @@ const Appeals = () => {
             sectionContentEn: "",
             sectionContentBn: "",
             sectionOrder: 1,
+            sectionImage: null,
+            sectionImagePreview: null,
           });
         }}
       >
@@ -429,7 +472,13 @@ const Appeals = () => {
                   <select
                     value={formData.sectionType}
                     onChange={(e) =>
-                      setFormData({ ...formData, sectionType: e.target.value })
+                      setFormData({
+                        ...formData,
+                        sectionType: e.target.value,
+                        ...(e.target.value !== "paragraph"
+                          ? { sectionImage: null, sectionImagePreview: null }
+                          : {}),
+                      })
                     }
                     className="input-field"
                   >
@@ -439,6 +488,32 @@ const Appeals = () => {
                     <option value="quote">Quote</option>
                   </select>
                 </div>
+
+                  {formData.sectionType === "paragraph" && (
+                    <div>
+                      <label className="form-label">
+                        Optional Image for Paragraph
+                      </label>
+                      <input
+                        type="file"
+                        onChange={handleSectionImageChange}
+                        accept="image/*"
+                        className="input-field"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">
+                        You can attach one small image to the left side of the paragraph.
+                      </p>
+                      {formData.sectionImagePreview && (
+                        <div className="mt-3">
+                          <img
+                            src={formData.sectionImagePreview}
+                            alt="Paragraph preview"
+                            className="w-40 h-24 object-cover rounded-lg border border-gray-200"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  )}
 
                 <div>
                   <label className="form-label">Content (English)</label>
@@ -497,6 +572,15 @@ const Appeals = () => {
                               ),
                           }}
                         />
+                        {(section.image || section.imagePreview) && (
+                          <div className="mt-3">
+                            <img
+                              src={section.image || section.imagePreview}
+                              alt="Section"
+                              className="w-40 h-24 object-cover rounded-lg border border-gray-200"
+                            />
+                          </div>
+                        )}
                       </div>
                       <button
                         onClick={() => removeSection(index)}
