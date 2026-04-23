@@ -10,6 +10,7 @@ const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobileAppealsOpen, setIsMobileAppealsOpen] = useState(false);
   const location = useLocation();
+  const safeAppeals = Array.isArray(appeals) ? appeals : [];
 
   const changeLanguage = (lng) => {
     i18n.changeLanguage(lng);
@@ -85,12 +86,12 @@ const Header = () => {
               </button>
 
               {/* The Dropdown Menu */}
-              <div className="invisible group-hover:visible opacity-0 group-hover:opacity-100 absolute top-12 left-0 w-[500px] bg-white shadow-xl rounded-xl border border-gray-100 p-4 grid grid-cols-2 gap-2 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50">
-                {appeals.map((item) => (
+              <div className="invisible group-hover:visible opacity-0 group-hover:opacity-100 absolute top-12 left-0 w-[500px] max-h-96 overflow-y-auto bg-white shadow-xl rounded-xl border border-gray-100 p-4 flex flex-col gap-2 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50">
+                {safeAppeals.map((item) => (
                   <Link
                     key={item._id}
                     to={`/appeals/${item.slug}`}
-                    className="block px-3 py-2 rounded-lg hover:bg-green-50 text-sm font-medium text-gray-700 hover:text-[#0B4D26] transition-colors"
+                    className="block w-full px-3 py-2 rounded-lg hover:bg-green-50 text-sm font-medium text-gray-700 hover:text-[#0B4D26] transition-colors"
                   >
                     {item.appeal}
                   </Link>
@@ -230,7 +231,7 @@ const Header = () => {
 
                 {isMobileAppealsOpen && (
                   <div className="pl-6 space-y-1 mt-1 border-l-2 border-green-100 ml-3">
-                    {appeals.map((item) => (
+                    {safeAppeals.map((item) => (
                       <Link
                         key={item._id}
                         to={`/appeals/${item.slug}`}

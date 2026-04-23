@@ -24,7 +24,7 @@ const OngoingActivities = () => {
       try {
         const response = await activityService.getAllActivities(1, 6);
         if (response.success) {
-          setActivities(response.data.activities);
+          setActivities(response.data?.activities || []);
         }
       } catch (error) {
         console.error("Error fetching ongoing activities:", error);

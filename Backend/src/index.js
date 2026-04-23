@@ -30,7 +30,11 @@ const app = express();
 app.use(helmet());
 app.use(cors(
   {
-    origin: [process.env.CLIENT_URL_1, process.env.CLIENT_URL_2, process.env.CLIENT_URL_3],
+    origin: [
+      process.env.CLIENT_URL_1 || "http://localhost:3000",
+      process.env.CLIENT_URL_2 || "http://localhost:5173",
+      process.env.CLIENT_URL_3 || "http://localhost:4173",
+    ],
     credentials: true,
   }
 ));

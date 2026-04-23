@@ -29,6 +29,8 @@ const EditAppealModal = ({
     sectionContentEn: "",
     sectionContentBn: "",
     sectionOrder: 1,
+    sectionImage: null,
+    sectionImagePreview: null,
   });
 
   // Load appeal data when modal opens
@@ -41,11 +43,20 @@ const EditAppealModal = ({
         existingImage: appeal.image || null,
         titleEn: appeal.title?.en || "",
         titleBn: appeal.title?.bn || "",
-        sections: appeal.sections ? [...appeal.sections] : [],
+        sections: appeal.sections
+          ? appeal.sections.map((section) => ({
+              ...section,
+              imagePreview: section.image || null,
+              imageFile: null,
+              hasImage: Boolean(section.image),
+            }))
+          : [],
         sectionType: "heading",
         sectionContentEn: "",
         sectionContentBn: "",
         sectionOrder: 1,
+        sectionImage: null,
+        sectionImagePreview: null,
       });
       setEditingSectionIndex(null);
     }
@@ -64,6 +75,36 @@ const EditAppealModal = ({
     }
   };
 
+  const handleSectionImageChange = (e) => {
+    const file = e.target.files?.[0];
+
+    if (file) {
+      if (!validations.isValidFile(file)) {
+        toast.error("Invalid file. Please upload an image (max 10MB)");
+        setFormData({
+          ...formData,
+          sectionImage: null,
+          sectionImagePreview: null,
+        });
+        return;
+      }
+
+      setFormData({
+        ...formData,
+        sectionImage: file,
+        sectionImagePreview: URL.createObjectURL(file),
+      });
+    }
+  };
+
+  const clearSectionImage = () => {
+    setFormData({
+      ...formData,
+      sectionImage: null,
+      sectionImagePreview: null,
+    });
+  };
+
   const addSection = () => {
     if (
       !formData.sectionContentEn.trim() ||
@@ -80,6 +121,11 @@ const EditAppealModal = ({
         bn: formData.sectionContentBn,
       },
       order: formData.sectionOrder,
+      image: null,
+      cloudinary_public_id: null,
+      imageFile: formData.sectionImage,
+      imagePreview: formData.sectionImagePreview,
+      hasImage: Boolean(formData.sectionImage),
     };
 
     setFormData({
@@ -88,6 +134,8 @@ const EditAppealModal = ({
       sectionContentEn: "",
       sectionContentBn: "",
       sectionOrder: formData.sectionOrder + 1,
+      sectionImage: null,
+      sectionImagePreview: null,
     });
   };
 
@@ -107,6 +155,8 @@ const EditAppealModal = ({
       sectionContentEn: section.content.en,
       sectionContentBn: section.content.bn,
       sectionOrder: section.order,
+      sectionImage: null,
+      sectionImagePreview: section.image || section.imagePreview || null,
     });
     setEditingSectionIndex(index);
   };
@@ -121,13 +171,36 @@ const EditAppealModal = ({
     }
 
     const updated = [...formData.sections];
+    const keepSectionImage = formData.sectionType === "paragraph";
     updated[editingSectionIndex] = {
+      ...updated[editingSectionIndex],
       type: formData.sectionType,
       content: {
         en: formData.sectionContentEn,
         bn: formData.sectionContentBn,
       },
       order: formData.sectionOrder,
+      imageFile: formData.sectionImage,
+      imagePreview:
+        (keepSectionImage
+          ? formData.sectionImagePreview ||
+        updated[editingSectionIndex]?.imagePreview ||
+        updated[editingSectionIndex]?.image ||
+        null
+          : null),
+      hasImage: keepSectionImage
+        ? Boolean(formData.sectionImage || updated[editingSectionIndex]?.image)
+        : false,
+      image: keepSectionImage
+        ? formData.sectionImage
+          ? null
+          : updated[editingSectionIndex]?.image || null
+        : null,
+      cloudinary_public_id: keepSectionImage
+        ? formData.sectionImage
+          ? null
+          : updated[editingSectionIndex]?.cloudinary_public_id || null
+        : null,
     };
 
     setFormData({
@@ -135,6 +208,8 @@ const EditAppealModal = ({
       sections: updated,
       sectionContentEn: "",
       sectionContentBn: "",
+      sectionImage: null,
+      sectionImagePreview: null,
     });
     setEditingSectionIndex(null);
   };
@@ -144,6 +219,8 @@ const EditAppealModal = ({
       ...formData,
       sectionContentEn: "",
       sectionContentBn: "",
+      sectionImage: null,
+      sectionImagePreview: null,
     });
     setEditingSectionIndex(null);
   };
@@ -203,11 +280,27 @@ const EditAppealModal = ({
           bn: formData.titleBn,
         }),
       );
-      formDataObj.append("sections", JSON.stringify(formData.sections));
+
+      const sectionsPayload = formData.sections.map(
+        ({ imageFile, imagePreview, ...section }) => ({
+          ...section,
+          image: section.image || null,
+          cloudinary_public_id: section.cloudinary_public_id || null,
+          hasImage: Boolean(imageFile),
+        }),
+      );
+
+      formDataObj.append("sections", JSON.stringify(sectionsPayload));
 
       if (formData.selectedImage) {
         formDataObj.append("image", formData.selectedImage);
       }
+
+      formData.sections
+        .filter((section) => section.type === "paragraph" && section.imageFile)
+        .forEach((section) => {
+          formDataObj.append("sectionImages", section.imageFile);
+        });
 
       await appealService.update(appeal.slug, formDataObj);
       toast.success("Appeal updated successfully!");
@@ -223,6 +316,33 @@ const EditAppealModal = ({
   };
 
   if (!appeal) return null;
+
+  const renderSectionImageField = () => (
+    <div>
+      <label className="form-label">Optional Image for Paragraph</label>
+      <input
+        type="file"
+        accept="image/*"
+        onChange={handleSectionImageChange}
+        className="input-field"
+      />
+      <p className="text-xs text-gray-500 mt-1">
+        You can attach one small image to the left side of the paragraph.
+      </p>
+      {formData.sectionImagePreview && (
+        <div className="mt-3 flex items-center gap-3">
+          <img
+            src={formData.sectionImagePreview}
+            alt="Paragraph preview"
+            className="w-40 h-24 object-cover rounded-lg border border-gray-200"
+          />
+          <Button type="button" variant="secondary" size="sm" onClick={clearSectionImage}>
+            Remove
+          </Button>
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <Modal
@@ -336,7 +456,13 @@ const EditAppealModal = ({
               <select
                 value={formData.sectionType}
                 onChange={(e) =>
-                  setFormData({ ...formData, sectionType: e.target.value })
+                  setFormData({
+                    ...formData,
+                    sectionType: e.target.value,
+                    ...(e.target.value !== "paragraph"
+                      ? { sectionImage: null, sectionImagePreview: null }
+                      : {}),
+                  })
                 }
                 className="input-field"
               >
@@ -345,6 +471,8 @@ const EditAppealModal = ({
                 <option value="highlight">Highlight</option>
                 <option value="quote">Quote</option>
               </select>
+
+              {formData.sectionType === "paragraph" && renderSectionImageField()}
 
               <div>
                 <label className="form-label">Content (English)</label>
@@ -390,7 +518,13 @@ const EditAppealModal = ({
               <select
                 value={formData.sectionType}
                 onChange={(e) =>
-                  setFormData({ ...formData, sectionType: e.target.value })
+                  setFormData({
+                    ...formData,
+                    sectionType: e.target.value,
+                    ...(e.target.value !== "paragraph"
+                      ? { sectionImage: null, sectionImagePreview: null }
+                      : {}),
+                  })
                 }
                 className="input-field"
               >
@@ -399,6 +533,8 @@ const EditAppealModal = ({
                 <option value="highlight">Highlight</option>
                 <option value="quote">Quote</option>
               </select>
+
+              {formData.sectionType === "paragraph" && renderSectionImageField()}
 
               <div>
                 <label className="form-label">Content (English)</label>
@@ -508,6 +644,15 @@ const EditAppealModal = ({
                       }}
                     />
                   </p>
+                  {(section.image || section.imagePreview) && (
+                    <div className="mt-3">
+                      <img
+                        src={section.image || section.imagePreview}
+                        alt="Section"
+                        className="w-40 h-24 object-cover rounded-lg border border-gray-200"
+                      />
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

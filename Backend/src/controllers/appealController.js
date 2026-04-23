@@ -6,6 +6,76 @@ import {
 } from "../utils/cloudinary.js";
 import fs from "fs";
 
+const getUploadedFiles = (files, fieldName) => {
+  if (!files || !files[fieldName]) return [];
+  return Array.isArray(files[fieldName]) ? files[fieldName] : [files[fieldName]];
+};
+
+const cleanupTempFiles = (files = []) => {
+  files.forEach((file) => {
+    if (file && fs.existsSync(file.path)) {
+      fs.unlinkSync(file.path);
+    }
+  });
+};
+
+const parseJsonField = (value, fallback) => {
+  if (value === undefined || value === null || value === "") return fallback;
+  return JSON.parse(value);
+};
+
+const attachSectionImages = async ({ sections, sectionFiles, existingSections }) => {
+  const existingById = new Map(
+    (existingSections || []).map((section) => [String(section._id), section]),
+  );
+
+  const finalSections = [];
+  let fileIndex = 0;
+
+  for (const section of sections) {
+    const normalized = {
+      ...section,
+      image: section.image ?? null,
+      cloudinary_public_id: section.cloudinary_public_id ?? null,
+    };
+
+    const existingSection = section._id
+      ? existingById.get(String(section._id))
+      : null;
+
+    const shouldAttachImage =
+      section.type === "paragraph" && Boolean(section.hasImage);
+    const file = shouldAttachImage ? sectionFiles[fileIndex] : null;
+
+    if (file) {
+      const uploadResult = await uploadToCloudinary(file, "appeal-sections");
+
+      if (
+        existingSection?.cloudinary_public_id &&
+        existingSection.cloudinary_public_id !== uploadResult.public_id
+      ) {
+        await deleteFromCloudinary(existingSection.cloudinary_public_id);
+      }
+
+      normalized.image = uploadResult.url;
+      normalized.cloudinary_public_id = uploadResult.public_id;
+      fileIndex += 1;
+    } else if (existingSection) {
+      normalized.image = existingSection.image || normalized.image;
+      normalized.cloudinary_public_id =
+        existingSection.cloudinary_public_id || normalized.cloudinary_public_id;
+    }
+
+    delete normalized.hasImage;
+    delete normalized.imageFile;
+    delete normalized.imagePreview;
+
+    finalSections.push(normalized);
+  }
+
+  return { finalSections };
+};
+
 // 1️⃣ GET full object by slug
 export const getAppealById = async (req, res) => {
   try {
@@ -38,12 +108,11 @@ export const getAllAppealsBasic = async (req, res) => {
 export const createAppeal = async (req, res) => {
   try {
     const { appeal, slug } = req.body;
-    const file = req.file;
+    const mainImageFile = getUploadedFiles(req.files, "image")[0];
+    const sectionFiles = getUploadedFiles(req.files, "sectionImages");
 
-    if (!appeal || !slug || !file) {
-      if (file && fs.existsSync(file.path)) {
-        fs.unlinkSync(file.path);
-      }
+    if (!appeal || !slug || !mainImageFile) {
+      cleanupTempFiles([mainImageFile, ...sectionFiles]);
       return res.status(400).json({
         message: "Appeal name, slug, and image file are required",
       });
@@ -52,39 +121,30 @@ export const createAppeal = async (req, res) => {
     // 🔥 Parse JSON fields manually (form-data sends them as strings)
     let title, sections;
     try {
-      title = JSON.parse(req.body.title);
-      sections = JSON.parse(req.body.sections);
+      title = parseJsonField(req.body.title, null);
+      sections = parseJsonField(req.body.sections, []);
     } catch (parseError) {
-      if (file && fs.existsSync(file.path)) {
-        fs.unlinkSync(file.path);
-      }
+      cleanupTempFiles([mainImageFile, ...sectionFiles]);
       return res.status(400).json({
         message: "Invalid JSON format for title or sections",
       });
     }
 
     if (!title || !sections) {
-      if (file && fs.existsSync(file.path)) {
-        fs.unlinkSync(file.path);
-      }
+      cleanupTempFiles([mainImageFile, ...sectionFiles]);
       return res.status(400).json({
         message: "Title and sections are required",
       });
     }
 
     // Upload image to Cloudinary
-    const cloudinaryResult = await uploadToCloudinary(file, "appeals");
+    const cloudinaryResult = await uploadToCloudinary(mainImageFile, "appeals");
+    const { finalSections } = await attachSectionImages({
+      sections,
+      sectionFiles,
+    });
 
-    // Delete temporary file safely
-    try {
-      if (fs.existsSync(file.path)) {
-        fs.unlinkSync(file.path);
-      }
-    } catch (fsError) {
-      console.warn(
-        `Warning: Could not delete temporary file: ${fsError.message}`,
-      );
-    }
+    cleanupTempFiles([mainImageFile, ...sectionFiles]);
 
     const newAppeal = new Appeal({
       appeal,
@@ -92,7 +152,7 @@ export const createAppeal = async (req, res) => {
       image: cloudinaryResult.url,
       cloudinary_public_id: cloudinaryResult.public_id,
       title,
-      sections,
+      sections: finalSections,
     });
 
     const savedAppeal = await newAppeal.save();
@@ -101,9 +161,10 @@ export const createAppeal = async (req, res) => {
   } catch (error) {
     // Safe cleanup
     try {
-      if (req.file && fs.existsSync(req.file.path)) {
-        fs.unlinkSync(req.file.path);
-      }
+      cleanupTempFiles([
+        ...getUploadedFiles(req.files, "image"),
+        ...getUploadedFiles(req.files, "sectionImages"),
+      ]);
     } catch (fsError) {
       console.warn(
         `Warning: Could not delete temporary file: ${fsError.message}`,
@@ -151,16 +212,15 @@ export const updateAppeal = async (req, res) => {
   try {
     const { id } = req.params; // This is now the slug
     const { appeal, slug: newSlug } = req.body;
-    const file = req.file;
+    const mainImageFile = getUploadedFiles(req.files, "image")[0];
+    const sectionFiles = getUploadedFiles(req.files, "sectionImages");
 
     const existingAppeal = await Appeal.findOne({
       slug: id.toLowerCase().trim(),
     });
 
     if (!existingAppeal) {
-      if (file && fs.existsSync(file.path)) {
-        fs.unlinkSync(file.path);
-      }
+      cleanupTempFiles([mainImageFile, ...sectionFiles]);
       return res.status(404).json({ message: "Appeal not found" });
     }
 
@@ -170,11 +230,9 @@ export const updateAppeal = async (req, res) => {
 
     if (req.body.title) {
       try {
-        title = JSON.parse(req.body.title);
+        title = parseJsonField(req.body.title, existingAppeal.title);
       } catch (parseError) {
-        if (file && fs.existsSync(file.path)) {
-          fs.unlinkSync(file.path);
-        }
+        cleanupTempFiles([mainImageFile, ...sectionFiles]);
         return res.status(400).json({
           message: "Invalid JSON format for title",
         });
@@ -183,11 +241,9 @@ export const updateAppeal = async (req, res) => {
 
     if (req.body.sections) {
       try {
-        sections = JSON.parse(req.body.sections);
+        sections = parseJsonField(req.body.sections, existingAppeal.sections);
       } catch (parseError) {
-        if (file && fs.existsSync(file.path)) {
-          fs.unlinkSync(file.path);
-        }
+        cleanupTempFiles([mainImageFile, ...sectionFiles]);
         return res.status(400).json({
           message: "Invalid JSON format for sections",
         });
@@ -198,19 +254,10 @@ export const updateAppeal = async (req, res) => {
     let publicId = existingAppeal.cloudinary_public_id;
 
     // Upload new image if provided
-    if (file) {
-      const cloudinaryResult = await uploadToCloudinary(file, "appeals");
+    if (mainImageFile) {
+      const cloudinaryResult = await uploadToCloudinary(mainImageFile, "appeals");
 
-      // Delete temporary file safely
-      try {
-        if (fs.existsSync(file.path)) {
-          fs.unlinkSync(file.path);
-        }
-      } catch (fsError) {
-        console.warn(
-          `Warning: Could not delete temporary file: ${fsError.message}`,
-        );
-      }
+      cleanupTempFiles([mainImageFile]);
 
       imageUrl = cloudinaryResult.url;
 
@@ -221,6 +268,32 @@ export const updateAppeal = async (req, res) => {
       publicId = cloudinaryResult.public_id;
     }
 
+    const existingSectionsById = new Map(
+      existingAppeal.sections.map((section) => [String(section._id), section]),
+    );
+    const incomingIds = new Set(
+      sections.filter((section) => section._id).map((section) => String(section._id)),
+    );
+    const removedSections = existingAppeal.sections.filter(
+      (section) => !incomingIds.has(String(section._id)),
+    );
+
+    const removedSectionIds = removedSections
+      .map((section) => section.cloudinary_public_id)
+      .filter(Boolean);
+
+    const { finalSections } = await attachSectionImages({
+      sections,
+      sectionFiles,
+      existingSections: existingAppeal.sections,
+    });
+
+    cleanupTempFiles([mainImageFile, ...sectionFiles]);
+
+    if (removedSectionIds.length > 0) {
+      await Promise.all(removedSectionIds.map((publicId) => deleteFromCloudinary(publicId)));
+    }
+
     const updatedAppeal = await Appeal.findByIdAndUpdate(
       existingAppeal._id,
       {
@@ -229,7 +302,7 @@ export const updateAppeal = async (req, res) => {
         image: imageUrl,
         cloudinary_public_id: publicId,
         title,
-        sections,
+        sections: finalSections,
       },
       { new: true, runValidators: true },
     );
@@ -238,9 +311,10 @@ export const updateAppeal = async (req, res) => {
   } catch (error) {
     // Safe cleanup
     try {
-      if (req.file && fs.existsSync(req.file.path)) {
-        fs.unlinkSync(req.file.path);
-      }
+      cleanupTempFiles([
+        ...getUploadedFiles(req.files, "image"),
+        ...getUploadedFiles(req.files, "sectionImages"),
+      ]);
     } catch (fsError) {
       console.warn(
         `Warning: Could not delete temporary file: ${fsError.message}`,
